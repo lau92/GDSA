@@ -12,12 +12,13 @@ def main():
     pathHome = os.path.abspath('/Users/Tania')
     datasetsPath = os.path.join( pathHome, 'workspace', 'pyxel','tools','socialevent','mediaeval2013','classification', '2_datasets')   
     
+    # Arxiu csv que conte veritat terreny
     groundTruthFile = 'sed2013_task2_dataset_train_gs.csv'
     
+    # Creacio arxius que contindra anotacio i ontologia
     annotationFile = 'annotation.p'
     ontologyFile = 'ontology.p'
     
-    print "Directoris"
     annotationSavePathFile = os.path.join(datasetsPath, annotationFile)
     groundTruthPathFile = os.path.join(datasetsPath, groundTruthFile)
     ontologyPathFile = os.path.join(datasetsPath, ontologyFile)
@@ -47,5 +48,9 @@ def main():
     
     pickle.dump( annotation , open( annotationSavePathFile ,'wb'))
     pickle.dump( ontology , open( ontologyPathFile ,'wb'))
+    
+    print "S'han creat correctament els arxius annotation i ontology, ja no cal fer-ho més"
 
+# Perque funcioni correctament s'ha de posar la seguent ordre en comptes de la que havia
 main()
+    
