@@ -61,7 +61,9 @@ def main():
 
     # Save models to disk
     # Dins de 5_models guarda el model fet pel train
-    textual_trainer.save_model_to_disk( pathDirModels, 'textual_model_svm_annotation.p')
+    # Hem canviat el nom de l'arxiu textual per a que concordi amb el que posa a 6_Detector
+    # Pot ser que el canvi s'hagi de desfer
+    textual_trainer.save_model_to_disk( pathDirModels, 'textual_model_svm.p')
 #    visual_trainer.save_model_to_disk( pathDirModels, 'visual_model_svm.p')
     
     
