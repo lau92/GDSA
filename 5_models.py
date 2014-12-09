@@ -24,6 +24,8 @@ def main():
     pathFileFeaturesText = os.path.join(pathWork,'4_tfidf','train')
     ontologyFile = 'ontology.p'
     annotationFile = 'annotation.p'
+    
+    # Obre els dos arxius
     annotationSavePathFile = os.path.join(pathDirDatasets, annotationFile)
     ontologyPathFile = os.path.join(pathDirDatasets, ontologyFile)
 
@@ -31,6 +33,7 @@ def main():
     ontologyObject = Ontology()
     ontologyObject.loadOntology(ontologyPathFile)
 
+    # carrega les anotacions
     annotation = Annotation(ontologyObject)
     
     annotation = pickle.load(open(annotationSavePathFile,'rb'))
@@ -57,9 +60,10 @@ def main():
     
 
     # Save models to disk
+    # Dins de 5_models guarda el model fet pel train
     textual_trainer.save_model_to_disk( pathDirModels, 'textual_model_svm_annotation.p')
 #    visual_trainer.save_model_to_disk( pathDirModels, 'visual_model_svm.p')
     
     
-def run():
-    main()
+
+main()
