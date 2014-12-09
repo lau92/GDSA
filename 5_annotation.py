@@ -9,18 +9,20 @@ from modules.classification.LabelType import LabelType
 
 def main():
     # Paths
-    HOME = os.path.abspath('/Users/Tania');
-    
-    datasetsPath = os.path.join( pathHome, 'workspace', 'pyxel','tools','socialevent','mediaeval2013','classification’, ‘5_annotation’ )   
+    pathHome = os.path.abspath('/Users/Tania')
+    datasetsPath = os.path.join( pathHome, 'workspace', 'pyxel','tools','socialevent','mediaeval2013','classification', '2_datasets')   
     
     groundTruthFile = 'sed2013_task2_dataset_train_gs.csv'
     
     annotationFile = 'annotation.p'
     ontologyFile = 'ontology.p'
+    
+    print "Directoris"
     annotationSavePathFile = os.path.join(datasetsPath, annotationFile)
     groundTruthPathFile = os.path.join(datasetsPath, groundTruthFile)
     ontologyPathFile = os.path.join(datasetsPath, ontologyFile)
     
+    # Lectura de l'arxiu de ground truth
     dataframe_csv = pd.read_csv('%s' % (groundTruthPathFile), sep='\t')
     
     # For each class of event
@@ -46,6 +48,4 @@ def main():
     pickle.dump( annotation , open( annotationSavePathFile ,'wb'))
     pickle.dump( ontology , open( ontologyPathFile ,'wb'))
 
-def run():
-    main()
-    
+main()
