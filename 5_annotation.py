@@ -7,23 +7,20 @@ from modules.classification.Annotation import Annotation
 from modules.classification.Ontology import Ontology
 from modules.classification.LabelType import LabelType
 
-def main():
+if __name__ == "__main__":
     # Paths
-    pathHome = os.path.abspath('/Users/Tania')
-    datasetsPath = os.path.join( pathHome, 'workspace', 'pyxel','tools','socialevent','mediaeval2013','classification', '2_datasets')   
+    pathHome = os.path.abspath('C:\Users\Adria\Documents\upc_temp\gdsa\Projecte\proves_proj\emohe-pyxel-deb01cc5202e')
+    pathWork = os.path.join(pathHome, 'tools','socialevent','mediaeval2013','classification' )
+    datasetsPath = os.path.join( pathWork,'2_datasets')
     
-    # Arxiu csv que conte veritat terreny
     groundTruthFile = 'sed2013_task2_dataset_train_gs.csv'
     
-    # Creacio arxius que contindra anotacio i ontologia
     annotationFile = 'annotation.p'
     ontologyFile = 'ontology.p'
-    
     annotationSavePathFile = os.path.join(datasetsPath, annotationFile)
     groundTruthPathFile = os.path.join(datasetsPath, groundTruthFile)
     ontologyPathFile = os.path.join(datasetsPath, ontologyFile)
     
-    # Lectura de l'arxiu de ground truth
     dataframe_csv = pd.read_csv('%s' % (groundTruthPathFile), sep='\t')
     
     # For each class of event
@@ -48,9 +45,4 @@ def main():
     
     pickle.dump( annotation , open( annotationSavePathFile ,'wb'))
     pickle.dump( ontology , open( ontologyPathFile ,'wb'))
-    
-    print "S'han creat correctament els arxius annotation i ontology, ja no cal fer-ho més"
-
-# Perque funcioni correctament s'ha de posar la seguent ordre en comptes de la que havia
-main()
     
