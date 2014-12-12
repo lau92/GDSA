@@ -7,11 +7,10 @@ from modules.classification.Trainer import Trainer
 from modules.classification.Annotation import Annotation
 from modules.classification.Ontology import Ontology
 
-def main():
-#if __name__ == "__main__":
-    
-    pathHome = os.path.abspath('/Users/Tania');
-    pathWork = os.path.join( pathHome, 'workspace', 'pyxel','tools','socialevent','mediaeval2013','classification' )    
+
+if __name__ == "__main__":
+    pathHome = os.path.abspath('C:\Users\Adria\Documents\upc_temp\gdsa\Projecte\proves_proj\emohe-pyxel-deb01cc5202e')
+    pathWork = os.path.join(pathHome, 'tools','socialevent','mediaeval2013','classification' )    
     pathDirModels = os.path.join( pathWork, '5_models')
     
     # If necessary, create a directory to save the models
@@ -24,8 +23,6 @@ def main():
     pathFileFeaturesText = os.path.join(pathWork,'4_tfidf','train')
     ontologyFile = 'ontology.p'
     annotationFile = 'annotation.p'
-    
-    # Obre els dos arxius
     annotationSavePathFile = os.path.join(pathDirDatasets, annotationFile)
     ontologyPathFile = os.path.join(pathDirDatasets, ontologyFile)
 
@@ -33,7 +30,6 @@ def main():
     ontologyObject = Ontology()
     ontologyObject.loadOntology(ontologyPathFile)
 
-    # carrega les anotacions
     annotation = Annotation(ontologyObject)
     
     annotation = pickle.load(open(annotationSavePathFile,'rb'))
@@ -60,12 +56,5 @@ def main():
     
 
     # Save models to disk
-    # Dins de 5_models guarda el model fet pel train
-    # Hem canviat el nom de l'arxiu textual per a que concordi amb el que posa a 6_Detector
-    # Pot ser que el canvi s'hagi de desfer
-    textual_trainer.save_model_to_disk( pathDirModels, 'textual_model_svm.p')
+    textual_trainer.save_model_to_disk( pathDirModels, 'textual_model_svm_annotation.p')
 #    visual_trainer.save_model_to_disk( pathDirModels, 'visual_model_svm.p')
-    
-    
-
-main()
