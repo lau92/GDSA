@@ -10,8 +10,8 @@ from modules.classification.Ontology import Ontology
 def main():
 #if __name__ == "__main__":
     print " main function runing "
-    pathHome = os.path.abspath('/Users/Tania');
-    pathWork = os.path.join( pathHome, 'workspace', 'pyxel','tools','socialevent','mediaeval2013','classification' )     
+    pathHome = os.path.abspath('C:\Users\Adria\Documents\upc_temp\gdsa\Projecte\proves_proj\emohe-pyxel-deb01cc5202e')
+    pathWork = os.path.join(pathHome, 'tools','socialevent','mediaeval2013','classification' )     
     # load models from path:
     pathDirModels = os.path.join( pathWork, '5_models')
     # load fueatures from path:
@@ -20,7 +20,7 @@ def main():
     pathDirFeaturesText = os.path.join(pathWork,'4_tfidf','test')
     
 #    pathFileVisualModel = os.path.join(pathDirModels,'visual_model_svm.p')
-    pathFileTextualModel = os.path.join(pathDirModels,'textual_model_svm.p')
+    pathFileTextualModel = os.path.join(pathDirModels,'textual_model_svm_annotation.p')
     
     # Ontology
     ontologyFile = 'ontology.p'
@@ -34,7 +34,6 @@ def main():
     textual_detector = Detector(pathFileTextualModel, ontology)
     
     # file with test images ids
-    #Hem canviat test_21_7.txt per test.txt
     pathFileDataset = os.path.join( pathDirDatasets, 'test.txt')
     
     # Run detectors
@@ -54,15 +53,7 @@ def main():
     print 'Textual classifier detected in ',textual_time, ' seconds'
     
     #path to save results
-    #S'ha de crear la carpeta al directori, ja que no està   
-    
     pathDirResults = os.path.join( pathWork,'6_results')
-    
-     # If necessary, create a directory to save the models
-    if not os.path.exists(pathDirResults):
-        print 'New directory created at ' + pathDirResults
-        os.makedirs(pathDirResults) 
-        
     #file to save results
 #    pathFileVisualResults = os.path.join( pathDirResults,'visual_results.txt')
     pathFileTextualResults = os.path.join( pathDirResults,'textual_results.txt')
