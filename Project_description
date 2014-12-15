@@ -1,0 +1,31 @@
+---Repository for a socialevent detection---
+Project made by students from the UPC (Universitat Politècnica de Catalunya).
+All files are performed for PYTHON language, you can compile it without problems, you only have to change all the path that appear
+in the scripts, following same folding's organitzation.
+This files are tools created by PYXEL library that allow to classify images in differents predefined classes by two ways: using the
+metadata asociated to the images or analising the images features.
+
+The result of the classification determines the event between 9 classes (concert, conference, 
+exhibition, fashion, other, protest, sports, theater_dance and no_event).
+
+Then, there are instructions to do the classification using this tools.
+
+If you want to do classification via metadata (textual) you have to create in your workspace a folder named: 1_images, and inside
+create two folders more: test and train (when we copy all photografies for train and test our classificator.
+Then you've to run seqüentially:
+    - 2_Database -> create two files (test.txt and train.txt) with all images ID's that belong to the images in each folder.
+    - 4_tfidf -> to create the vocabulary (word) and create for each image (in train and test) a BoW (bag of words).
+    - 5_annotation -> to create ontology and anotation, only one time for all runnings.
+    - 5_models -> train the trainer, and as a result, create class models to do the image's detection.
+    - 6_Detection -> do automatic detection of image class.
+
+If you want to do classification via visual analisis you have to create in your workspace a folder named: 1_images, and inside
+create two folders more: test and train (when we copy all photografies for train and test our classificator.
+Then you've to run seqüentially:
+    - 2_Database -> create two files (test.txt and train.txt) with all images ID's that belong to the images in each folder.
+    - 3_vocabulary -> to create the vocabulary.
+    - 4_bof -> create a BoF (bag of features) for each image.
+    - 5_annotation -> to create ontology and anotation, only one time for all runnings.
+    - 5_models -> train the trainer, and as a result, create class models to do the image's detection.
+    - 6_Detection -> do automatic detection of image class.
+    *Pay attention to comment lines and be sure to consider the visual option in the common scripts.
