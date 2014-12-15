@@ -12,16 +12,16 @@ import datetime
 timer = time.time()
 
 #Arxiu de resultats provinents del classificador
-#class_result = pd.read_csv('/Users/Lau/Desktop/UPC/Treball/resultats_classificats/classificacio_amb_6.txt', sep=' ')
+class_result = pd.read_csv('C:\Users\Lau\Desktop\UPC\GDSA\Treball\emohe-pyxel-deb01cc5202e/tools\socialevent\mediaeval2013\classification/6_results/textual_results.txt', sep=' ')
 
 #on es descarregaran els arxius dels altres equips
-class_result = pd.read_csv('C:\Users\Lau...', sep=' ')
+#class_result = pd.read_csv('C:\Users\Lau...', sep=' ')
 
 #Ground truth
 #Extracció de l'arxiu .csv on hi ha la veritat terreny de les solucions d'entrenament
-sol_train  = pd.read_csv('C:\Users\Lau...', sep=' ')
+sol_train  = pd.read_csv('C:\Users\Lau\Desktop\UPC\GDSA\Treball\emohe-pyxel-deb01cc5202e/tools\socialevent\mediaeval2013\classification/2_datasets/train.txt', sep=' ')
 
-#sol_train = pd.read_csv('/Users/JordiAguilar/Downloads/GT_RES_6.txt', sep=' ')
+
 
 #Inicialització matriu de confusió per a cada classe
 #[+certs, +fals, -fals, -cert]
@@ -186,9 +186,9 @@ total_f1score = sum(f1score) / num_events
 
 #class_result = pd.read_csv('/Users/Lau...', sep=' ')
 #class_result = list(csv.reader(open('/Users/Lau...','rb'),delimiter=' '))
-class_result = list(csv.reader(open('C:\Users\Lau...','rb'),delimiter=' '));
+class_result = list(csv.reader(open('C:\Users\Lau\Desktop\UPC\GDSA\Treball\emohe-pyxel-deb01cc5202e/tools\socialevent\mediaeval2013\classification/6_results/textual_results.txt','rb'),delimiter=' '));
 
-sol_train = list(csv.reader(open('C:\Users\Lau...','rb'),delimiter=' '));
+sol_train = list(csv.reader(open('C:\Users\Lau\Desktop\UPC\GDSA\Treball\emohe-pyxel-deb01cc5202e/tools\socialevent\mediaeval2013\classification/2_datasets/train.txt','rb'),delimiter=' '));
 
 doc_id=[];
 tags=[];
@@ -270,7 +270,7 @@ tpcent_erroni = 100 - accuracy
 events = [concert, conference, exhibition, fashion, non_event, other, protest, sports, the_dance]
 ev_name = ['Concert        ', 'Conference     ', 'Exhibition     ', 'Fashion        ', 'Non_event      ', 'Other          ', 'Protest        ', 'Sports         ', 'Theater_dance  ']
 
-f = open('C:\Users\Lau...', 'w')
+f = open('C:\Users\Lau\Desktop\UPC\GDSA\Treball\emohe-pyxel-deb01cc5202e/tools\socialevent\mediaeval2013\classification/7_evaluation', 'w')
 f.write("Resultats d'avaluaciÃ³:\n\n")
 f.write("Matrius de confusiÃ³\n\n")
 i = 0
