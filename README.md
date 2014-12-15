@@ -1,2 +1,1 @@
-GDSA
-====
+Repository for UPC socialevent detection project.
