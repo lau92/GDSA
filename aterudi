@@ -1,0 +1,235 @@
+%Avaluador
+
+%Selecció fitxer veritat terreny proveida a Atenea
+ARXIU = fopen('sed2013_task2_dataset_train_gs.csv'); %Obrim l'arxiu
+DADES = textscan(ARXIU, '%s%s'); %Llegim les dades
+fclose(ARXIU);
+
+%Lectura dels resultats textuals i visuals
+DADES_TEXTUAL = fopen('textual_results.txt');
+RESULTAT_TEXT = textscan(DADES_TEXTUAL, '%s%s'); 
+fclose(DADES_TEXTUAL); 
+
+DADES_VISUAL = fopen('visual_results_prova2.txt');
+RESULTAT_VISUAL = textscan(DADES_VISUAL, '%s%s'); 
+fclose(DADES_VISUAL);
+
+%Agafem les dades del nom i el tipus d'event de les dades dels tres arxius
+ID = DADES{:,1}; 
+EVENT_TYPE = DADES{:,2};
+EVENT_TYPE = EVENT_TYPE';
+
+ID_TEXT = RESULTAT_TEXT{:,1};
+EVENT_TEXT = RESULTAT_TEXT{:,2};
+EVENT_TEXT = EVENT_TEXT';
+
+ID_VISUAL = RESULTAT_VISUAL{:,1};
+EVENT_VISUAL = RESULTAT_VISUAL{:,2};
+EVENT_VISUAL = EVENT_VISUAL';
+
+%Llargada vectors
+LVTERRENY = length(EVENT_TYPE);  
+LVTEXT = length(EVENT_TEXT); 
+LVVISUAL = length(EVENT_VISUAL);
+
+ 
+%Guardem el vector de veritat terreny
+MAP_TERRENY = containers.Map();
+
+for y = 1:LVTERRENY
+    MAP_TERRENY(ID{y}) = EVENT_TYPE{y};
+end
+ 
+
+for y = 1:LVTEXT
+    idm = ID_TEXT{y};
+    if(isKey(MAP_TERRENY,idm) == 1) 
+        ID{y} = idm;
+        EVENT_TYPE{y} = MAP_TERRENY(idm);
+    end    
+end
+
+ 
+%per utilitzar la funcio "getcm" que genera parametres d'avaluacio, els vectors de clases de les imatges i la
+%veritat terreny han d'estar classificades en enters
+%strcmp compara si la posició del vector es la mateixa que fashion, non-event....
+%generem el vector d'enters del Veritat terreny
+v = zeros(1,LVTERRENY); %l'emplenem de 0 perque els dos vectors v i c d'enters siguin de la mateixa llargaria.
+for y=1:LVTERRENY
+    if strcmp(EVENT_TYPE(y),'fashion')
+        v(y)=1;
+        elseif strcmp(EVENT_TYPE(y),'concert')
+        v(y)=2;
+        elseif strcmp(EVENT_TYPE(y),'non_event')
+        v(y)=3;
+        elseif strcmp(EVENT_TYPE(y),'exhibition')
+        v(y)=4;
+        elseif strcmp(EVENT_TYPE(y),'sports')
+        v(y)=5;
+        elseif strcmp(EVENT_TYPE(y),'protest')
+        v(y)=6;
+        elseif strcmp(EVENT_TYPE(y),'theater_dance')
+        v(y)=7;
+        elseif strcmp(EVENT_TYPE(y),'conference')
+        v(y)=8;
+        elseif strcmp(EVENT_TYPE(y),'other')
+        v(y)=9;   
+    end;
+    
+end;
+ 
+%generem el vector d'enters del Classificador
+ 
+text = zeros(1,LVTERRENY);%l'emplenem de 0 perque els dos vectors v i c d'enters siguin de la mateixa llargaria.
+for y=1:LVTEXT
+    if strcmp(EVENT_TEXT(y),'fashion')
+        text(y)=1;
+        elseif strcmp(EVENT_TEXT(y),'concert')
+        text(y)=2;
+        elseif strcmp(EVENT_TEXT(y),'non_event')
+        text(y)=3;
+        elseif strcmp(EVENT_TEXT(y),'exhibition')
+        text(y)=4;
+        elseif strcmp(EVENT_TEXT(y),'sports')
+        text(y)=5;
+        elseif strcmp(EVENT_TEXT(y),'protest')
+        text(y)=6;
+        elseif strcmp(EVENT_TEXT(y),'theater_dance')
+        text(y)=7;
+        elseif strcmp(EVENT_TEXT(y),'conference')
+        text(y)=8;
+        elseif strcmp(EVENT_TEXT(y),'other')
+        text(y)=9; 
+    end;
+    
+end;
+
+visual = zeros(1,LVTERRENY);%l'emplenem de 0 perque els dos vectors v i c d'enters siguin de la mateixa llargaria.
+for y=1:LVVISUAL
+    if strcmp(EVENT_VISUAL(y),'fashion')
+        visual(y)=1;
+        elseif strcmp(EVENT_VISUAL(y),'concert')
+        visual(y)=2;
+        elseif strcmp(EVENT_VISUAL(y),'non_event')
+        visual(y)=3;
+        elseif strcmp(EVENT_VISUAL(y),'exhibition')
+        visual(y)=4;
+        elseif strcmp(EVENT_VISUAL(y),'sports')
+        visual(y)=5;
+        elseif strcmp(EVENT_VISUAL(y),'protest')
+        visual(y)=6;
+        elseif strcmp(EVENT_VISUAL(y),'theater_dance')
+        visual(y)=7;
+        elseif strcmp(EVENT_VISUAL(y),'conference')
+        visual(y)=8;
+        elseif strcmp(EVENT_VISUAL(y),'other')
+        visual(y)=9; 
+    end;
+    
+end;
+%vector=1:9;
+%cridem a la funcio que ens dona els resultats
+[mconfusiotxt,numcorrectetxt,precisiotxt,recalltxt,fs1coretxt] = getcm(v,text,(1:9))
+%Contem quantes classes hi ha a la veritat terreny i al text
+conttext = 0;
+for j=1:9
+    for y=1:length(v)
+        if v(y)==j
+            conttext = conttext + 1;
+            break; %si troba la classe surt del for i va a la seguent classe del classificador per mirar si està també en el vector veritat terreny
+        end
+    end
+end
+
+%vector=1:9;
+%cridem a la funcio que ens dona els resultats
+[mconfusiovisual,numcorrectevisual,precisiovisual,recallvisual,fs1corevisual] = getcm(v,visual,(1:9))
+%Contem quantes classes hi ha a la veritat terreny i al visual
+contvisual = 0;
+for j=1:9
+    for y=1:length(v)
+        if v(y)==j
+            contvisual = contvisual + 1;
+            break; %si troba la classe surt del for i va a la seguent classe del classificador per mirar si està també en el vector veritat terreny
+        end
+    end
+end
+
+
+%calculs de les avaluacions
+%Avaluacio Text
+Precisiontxt = sum(precisiotxt)/conttext;
+Recalltxt = sum(recalltxt)/conttext;
+F1scoretxt = sum(fs1coretxt)/conttext;
+Accuracytxt =(numcorrectetxt/LVTEXT)*100;
+%Avaluacio Visual
+Precisionvisual = sum(precisiovisual)/contvisual;
+Recallvisual = sum(recallvisual)/contvisual;
+F1scorevisual = sum(fs1corevisual)/contvisual;
+Accuracyvisual =(numcorrectevisual/LVVISUAL)*100;
+%Avaluació Mitja
+Precision = (Precisiontxt + Precisionvisual)/2;
+Recall = (Recalltxt + Recallvisual)/2;
+F1score = (F1scoretxt + F1scorevisual)/2;
+Accuracy =(Accuracytxt + Accuracyvisual)/2;
+ 
+ 
+%creació del fitxer de resultats
+evaluation = fopen('12.txt','w');
+
+fprintf(evaluation,'Avaluacio Text'); 
+fprintf(evaluation,'Precision=');
+fprintf(evaluation,'%f \n',Precisiontxt);
+fprintf(evaluation,'\n');
+
+fprintf(evaluation,'Recall=');
+fprintf(evaluation,'%f \n',Recalltxt);
+fprintf(evaluation,'\n');
+
+fprintf(evaluation,'Fscore=');
+fprintf(evaluation,'%f \n',F1scoretxt);
+fprintf(evaluation,'\n');
+ 
+fprintf(evaluation,'Accuracy=');
+fprintf(evaluation,'%f \n',Accuracytxt);
+fprintf(evaluation,'\n');
+
+fprintf(evaluation,'Avaluacio Visual');
+
+fprintf(evaluation,'Precision=');
+fprintf(evaluation,'%f \n',Precisionvisual);
+fprintf(evaluation,'\n');
+
+fprintf(evaluation,'Recall=');
+fprintf(evaluation,'%f \n',Recallvisual);
+fprintf(evaluation,'\n');
+
+fprintf(evaluation,'Fscore=');
+fprintf(evaluation,'%f \n',F1scorevisual);
+fprintf(evaluation,'\n');
+ 
+fprintf(evaluation,'Accuracy=');
+fprintf(evaluation,'%f \n',Accuracyvisual);
+fprintf(evaluation,'\n');
+
+fprintf(evaluation,'Mitjana Classificadors'); 
+fprintf(evaluation,'Precison=');
+fprintf(evaluation,'%f \n',Precision);
+fprintf(evaluation,'\n');
+
+fprintf(evaluation,'Recall=');
+fprintf(evaluation,'%f \n',Recall);
+fprintf(evaluation,'\n');
+
+fprintf(evaluation,'Fscore=');
+fprintf(evaluation,'%f \n',F1score);
+fprintf(evaluation,'\n');
+ 
+fprintf(evaluation,'Accuracy=');
+fprintf(evaluation,'%f \n',Accuracy);
+fprintf(evaluation,'\n');
+ 
+fclose(evaluation);
+
+ 
+ 
