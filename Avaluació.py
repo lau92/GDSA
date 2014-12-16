@@ -19,7 +19,7 @@ class_result = pd.read_csv('C:\Users\Lau\Desktop\UPC\GDSA\Treball\emohe-pyxel-de
 
 #Ground truth
 #Extracció de l'arxiu .csv on hi ha la veritat terreny de les solucions d'entrenament
-sol_train  = pd.read_csv('C:\Users\Lau\Desktop\UPC\GDSA\Treball\emohe-pyxel-deb01cc5202e/tools\socialevent\mediaeval2013\classification/2_datasets/train.txt', sep=' ')
+sol_train  = pd.read_csv('C:\Users\Lau\Desktop\UPC\GDSA\Treball\emohe-pyxel-deb01cc5202e/tools\socialevent\mediaeval2013\classification/6_results/textual_results.txt', sep=' ')
 
 
 
@@ -38,8 +38,8 @@ the_dance = np.zeros(4,float)
 sol_events = []
 a = 1
 
-while ( a < len(sol_train)):
-    sol_events.append(sol_train.event_type[a]) # append anyadeix un obj a la llista
+while  a < (len(sol_train)):
+    sol_events.append(sol_train.classe[a]) # append anyadeix un obj a la llista
     a+=1
 
 num_events = len(set(sol_events))
@@ -270,7 +270,7 @@ tpcent_erroni = 100 - accuracy
 events = [concert, conference, exhibition, fashion, non_event, other, protest, sports, the_dance]
 ev_name = ['Concert        ', 'Conference     ', 'Exhibition     ', 'Fashion        ', 'Non_event      ', 'Other          ', 'Protest        ', 'Sports         ', 'Theater_dance  ']
 
-f = open('C:\Users\Lau\Desktop\UPC\GDSA\Treball\emohe-pyxel-deb01cc5202e/tools\socialevent\mediaeval2013\classification/7_evaluation', 'w')
+f = open('C:\Users\Lau\Desktop\UPC\GDSA\Treball\emohe-pyxel-deb01cc5202e/tools\socialevent\mediaeval2013\classification/7_evaluation/12.txt', 'w')
 f.write("Resultats d'avaluaciÃ³:\n\n")
 f.write("Matrius de confusiÃ³\n\n")
 i = 0
