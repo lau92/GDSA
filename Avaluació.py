@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #Metadata Social Event Classification: AVALUADOR
-
+import os
 import pandas as pd
 import csv
 import numpy as np
@@ -11,19 +11,25 @@ import datetime
 
 timer = time.time()
 
+pathHome = os.path.abspath('C:\Users\Lau\Desktop\UPC\GDSA\Treball\emohe-pyxel-deb01cc5202e')
+pathWork = os.path.join(pathHome, 'tools','socialevent','mediaeval2013','classification' )
+pathDirResults = os.path.join(pathWork, '6_results')
+
 #Arxiu de resultats provinents del classificador
-class_result = pd.read_csv('C:\Users\Lau\Desktop\UPC\GDSA\Treball\emohe-pyxel-deb01cc5202e/tools\socialevent\mediaeval2013\classification/6_results/textual_results.txt', sep=' ')
+VisualResultFile = os.path.join(pathDirResults, 'visual_results_prova2.txt')
+class_result = pd.read_csv(VisualResultFile, sep=' ')
 
 #on es descarregaran els arxius dels altres equips
 #class_result = pd.read_csv('C:\Users\Lau...', sep=' ')
 
 #Ground truth
-#Extracció de l'arxiu .csv on hi ha la veritat terreny de les solucions d'entrenament
-sol_train  = pd.read_csv('C:\Users\Lau\Desktop\UPC\GDSA\Treball\emohe-pyxel-deb01cc5202e/tools\socialevent\mediaeval2013\classification/6_results/textual_results.txt', sep=' ')
+#ExtracciÃ³ de l'arxiu .csv on hi ha la veritat terreny de les solucions d'entrenament
+pathDirGT = os.path.join(pathWork, '2_datasets')
+GTFile = os.path.join(pathDirGT, 'sed2013_task2_dataset_train_gs.csv')
+sol_train  = pd.read_csv(GTFile, sep=' ')
 
 
-
-#Inicialització matriu de confusió per a cada classe
+#InicialitzaciÃ³ matriu de confusiÃ³ per a cada classe
 #[+certs, +fals, -fals, -cert]
 concert =   np.zeros(4,float)
 conference =np.zeros(4,float)
@@ -38,8 +44,8 @@ the_dance = np.zeros(4,float)
 sol_events = []
 a = 1
 
-while  a < (len(sol_train)):
-    sol_events.append(sol_train.classe[a]) # append anyadeix un obj a la llista
+while ( a < len(sol_train)):
+    sol_events.append(sol_train.event_type[a]) # append anyadeix un obj a la llista
     a+=1
 
 num_events = len(set(sol_events))
@@ -270,9 +276,9 @@ tpcent_erroni = 100 - accuracy
 events = [concert, conference, exhibition, fashion, non_event, other, protest, sports, the_dance]
 ev_name = ['Concert        ', 'Conference     ', 'Exhibition     ', 'Fashion        ', 'Non_event      ', 'Other          ', 'Protest        ', 'Sports         ', 'Theater_dance  ']
 
-f = open('C:\Users\Lau\Desktop\UPC\GDSA\Treball\emohe-pyxel-deb01cc5202e/tools\socialevent\mediaeval2013\classification/7_evaluation/12.txt', 'w')
-f.write("Resultats d'avaluaciÃ³:\n\n")
-f.write("Matrius de confusiÃ³\n\n")
+f = open('C:\Users\Adria\Documents\upc_temp\gdsa\Projecte\proves_proj\emohe-pyxel-deb01cc5202e\tools\socialevent\mediaeval2013\classification/7_evaluation', 'w')
+f.write("Resultats d'avaluacio:\n\n")
+f.write("Matrius de confusio\n\n")
 i = 0
 while (i < 9):
     f.write(ev_name[i]+'\n')
