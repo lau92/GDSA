@@ -1,0 +1,240 @@
+import pickle
+import numpy as np
+import os
+from modules.classification.Annotation import Annotation
+from modules.classification.LabelType import LabelType
+
+
+class Detector:
+    """ This class predict a collection of images and create a Annotation with 
+        the predicted data"""
+    
+    def __init__(self, Model_file, ontology):
+        
+        self.classifier = pickle.load(open( Model_file, "rb" ))
+    
+        #self.descriptor = []
+        # create an Annotation to save in the predicted results
+        self.results = Annotation(ontology)
+        # if you select the flagVerbose as true, each function give you some 
+        # details about what is happend         
+        self.flagVerbose=False
+        self.voting_results = {}
+        
+    def get_labels(self):
+        return list(self.classifier.classes_)
+        
+    def createCompleteAnnotation( self ):
+        """ This function generate an anootation with positive and negative values"""
+        
+        for semanticClassName in self.results.getSemanticClassNames():
+            for imageID in self.results.getDocIdsInClass(semanticClassName, LabelType.POSITIVE):
+                " add each image from the positive label type to the other label types"
+                self.results.addInstance(semanticClassName, LabelType.NEGATIVE, imageID)
+                self.results.addInstance(semanticClassName, LabelType.NEUTRAL, imageID)
+    
+    def loadDescriptor( self, pathTxtFile, pathDirFeatures ):
+        """ This function returns a descriptor for each image in the txt file,
+            the descriptor is must be the selected directory. If there are some 
+            descriptors that not exits, generates a file with it names. """
+            
+        if self.flagVerbose:
+            print 'Reading images from ' + pathTxtFile + "..."
+        
+        # Read the file containing the image IDs
+        fileDataset = open( pathTxtFile, 'r')
+        
+        # Read lines from the text file, stripping the end of line character
+        imageIds = [line.strip() for line in fileDataset ]
+        
+        # Close file
+        fileDataset.close()
+        
+        descriptors = {}
+        notExistFile = open ('notExistFile.txt','w')
+        # For each provided image ID...
+        for imageId in imageIds:
+
+                # Load feature vector
+                
+                if not os.path.exists(os.path.join( pathDirFeatures, imageId + '.p')):
+                    notExistFile.write(str(imageId)+'\n')
+                else:
+                    pathFile = os.path.join( pathDirFeatures, imageId + '.p')
+                    featureVector = pickle.load( open( pathFile, "rb" ) )
+                
+                    descriptors[imageId] = featureVector
+                
+        return descriptors
+    
+    def predict_collection(self, pathTxtFile,pathDirFeatures ):
+        """This function predicts a given collection of images"""
+        
+        # descriptos is a dict that contains each featureVector asociate an id
+        descriptors = self.loadDescriptor(pathTxtFile, pathDirFeatures)
+        
+        # Get each document_id
+        imageIds = descriptors.keys()
+        
+        # for each id get the belonger descritor and predict a class
+        for imageId in imageIds:
+            
+            print imageId
+            className = self.predict_class(descriptors[imageId])
+            print className[0]
+            self.results.addInstance(className[0], LabelType.POSITIVE, imageId)
+            
+        return self.results
+    
+    def get_results(self):
+        return self.results
+        
+    def save_to_file(self, pathFileResults):
+        textResultsFile = open(pathFileResults, 'wb')
+        semanticClassNames = self.results.getSemanticClassNames()
+        
+        for semanticClassName in semanticClassNames:
+            for imageId in self.results.getDocIdsInClass(semanticClassName,1):
+                    print imageId
+                    textResultsFile.write(str(imageId)+" "+str(self.results.getAnnotatedClasses(1,imageId)[0])+'\n')
+            #textResultsFile.write(str(imageId)+" "+str(self.results[imageId][0])+'\n')
+        textResultsFile.close()
+    
+    def predict_class(self, descriptor):
+        return self.classifier.predict(descriptor)
+   
+    def combine_voting_in_added_with(self, feature_voting):
+        added_votes = []
+        combinate_voting = {}
+        imageIds = self.voting_results.keys()
+        labels = self.get_labels()
+        
+        for imageId in imageIds:
+            for label in range(len(labels)):
+                add = self.voting_results[imageId][label][0]+feature_voting[imageId][label][0]
+                added_votes.append(add)
+            combinate_voting[imageId]= added_votes
+            added_votes = []
+        return combinate_voting,labels
+    
+    def predict_class_from_voting(self, combinate_voting):
+        imageIds = self.voting_results.keys()
+        labels = self.get_labels() # labels are the classNames
+        
+        for imageId in imageIds:
+            for className in range(len(labels)):
+                if combinate_voting[imageId][className] == max(combinate_voting[imageId]):     
+                    self.results.addInstance(className, 1, imageId)
+        return self.results
+   
+    def combine_ponderating_voting_with(self, feature_voting, ponderation):
+        added_votes = []
+        combinate_voting = {}
+        imageIds = self.voting_results.keys()
+        labels = self.get_labels()
+        for imageId in imageIds:
+            for label in range(len(labels)):
+                add = self.voting_results[imageId][label][0]+(ponderation*feature_voting[imageId][label][0])
+                added_votes.append(add)
+            combinate_voting[imageId]= added_votes
+            added_votes = []
+        return combinate_voting,labels  
+    
+              
+    def get_voting_collection(self, pathTxtFile,pathDirFeatures ):
+        # descriptos is a dict that contains each featureVector asociate an id
+        descriptors = self.loadDescriptor(pathTxtFile, pathDirFeatures)
+
+        # Get each document_id
+        imageIds = descriptors.keys()
+        # for each id get the belonger descritor and predict a class
+        for imageId in imageIds:
+            vot = self.get_voting(descriptors[imageId])
+            self.voting_results[imageId] = vot.tolist()
+                               
+        return self.voting_results
+
+    def get_voting(self,descriptor):
+        
+        classes = self.get_labels()
+        #I assume that in 'classes' I have a list of the class names. We could have an integer with the number of classes istead .
+        voting = np.zeros((len(classes),1))
+        
+        #Define a matrix that will be filled with the pairs of classes that are being compared in the classifier
+        voting_c = np.zeros((2,len(classes)*(len(classes)-1)/2))
+        vcount=0
+        
+        #'voting_c' is used to relate the svm output with each pair of classes being compared by the nclasses_(nclasses-1)/2 classifiers
+        
+        #Compute 'voting_c' ...
+        for i in range(0,len(classes)-1):
+            for j in range(i+1,len(classes)):
+                
+                voting_c[0,vcount] = i
+                voting_c[1,vcount] = j 
+                
+                #'voting_c' has in each column 'vcount' the two classes that are compared by the classifier
+                #Example of voting_c for 4 classes:
+                #voting_c=[[ 0.  0.  0.  1.  1.  2.]
+                #         [ 1.  2.  3.  2.  3.  3.]]
+
+                vcount+=1
+        
+        #Scores given by every classifier (nclasses*(nclasses-1)/2 classifiers) that are returned by the svm for a given descriptor query
+        
+        decis = self.classifier.decision_function(descriptor)
+        
+        for p in range(np.shape(decis)[1]):
+            
+             if decis[0][p]>0:
+                 voting[int(voting_c[0,p])]+=1 #If >0, a vote is given to the first class                       
+             else:
+                 voting[int(voting_c[1,p])]+=1 #If <0, a vote is given to the second class
+                 
+        #'voting' contains the number of votes that each class got for a query image 
+        #Example of 'voting' for a 4class problem:
+        #array([[ 1.],
+        #[ 3.],
+        #[ 2.],
+        #[ 0.]])
+      
+        #ypredict=np.argmax(voting)
+        
+        return voting
+         
+        #Tips for evaluation:
+                                
+        #We need to be careful at evaluation time! 
+     
+        #Two possible situations:
+        
+        #1. If we are only considering visual data, the method 'return_class' should be called. It only returns the name of the class. 
+        #   Simpler! We don't need to sort the classes alphabetically:
+        #   At query time, we only need to check if the classId is equal to the one returned by 'return_class' (they are both strings).
+        
+        #2. If we are mixing visual with textual, we'll to use the method 'return_voting' and mix both 'voting' arrays somehow (to be done in a new class). 
+        #   This should generate a new 'voting' array which is the sum of the weighted 'voting''s of both visual and textual. The class is returned by np.argmax(voting), 
+        #   but it is in the form of an integer and needs to be related to a class of the ground truth (so that we know if the image has been correctly classified or not). 
+        #   In this case we'll need to sort our class string array and give an index to each one of them (so that we can evaluate the output that np.argmax(voting) returns).
+        
+        #   How the class array should be converted in the second case:
+        #   (e.g. ['A','C','B'] --> ['A','B','C']--> [0,1,2] )
+        
+        #   And then at query time, if an image is of class 'C', we should know that it is of class 2 (in the example above), and evaluate the result the same way as before:
+        #   Check if np.argmax(voting) equals 2.
+            
+    def saveAnnotation ( self, AnnotationPath):
+         pickle.dump(self.results, open( AnnotationPath ,'wb'))
+# Main
+if __name__ == "__main__":
+
+    # Point to the local path where the ground truth and metadata are stored
+    HOME = os.path.expanduser('~')
+    DATASET_PATH = HOME+'/work/mediaeval/2013-sed/1_datasets'
+    
+    MODEL_FILE = 'model_svm.p' # created by Trainer, you should to put the same name 
+    
+    # Load the metadata
+    Model_file = os.path.join(DATASET_PATH, MODEL_FILE)
+    detector = Detector(Model_file)
+
