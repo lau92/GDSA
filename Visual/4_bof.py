@@ -32,7 +32,7 @@ if __name__ == "__main__":
     pathWork = os.path.join(pathHome, 'tools','socialevent','mediaeval2013','classification' )
     pathDirImagesBase = os.path.join(pathWork, '1_images')
     pathDirDatasets = os.path.join(pathWork, '2_datasets')
-    pathFileVocabulary = os.path.join( pathWork, '3_vocabulary','vocabulary_prova2.p' )
+    pathFileVocabulary = os.path.join( pathWork, '3_vocabulary','vocabulary12345.p' )
     #pathFileVocabulary = os.path.join( pathWork, '3_vocabulary','vocabulary.p' )
     pathDirBofs = os.path.join(pathWork, '4_bof')
     
@@ -40,11 +40,11 @@ if __name__ == "__main__":
     bofExtractor = BofExtractor(pathFileVocabulary, flagVerbose=False)
     
     # Process the train dataset
-    processLabel(pathDirImagesBase, pathDirDatasets, bofExtractor, pathDirBofs, 'train')
+    #processLabel(pathDirImagesBase, pathDirDatasets, bofExtractor, pathDirBofs, 'train12345')
     #processLabel(pathDirImagesBase, pathDirDatasets, bofExtractor, pathDirBofs, 'train')
     
     # Process the test dataset
-    processLabel(pathDirImagesBase, pathDirDatasets, bofExtractor, pathDirBofs, 'test')
+    processLabel(pathDirImagesBase, pathDirDatasets, bofExtractor, pathDirBofs, 'Images5')
     #processLabel(bofExtractor, pathDirBofs, 'test')
     
     print "Extracting BoF... done."
