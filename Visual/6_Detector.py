@@ -17,11 +17,11 @@ def main():
     # load fueatures from path:
     pathDirDatasets = os.path.join( pathWork,'2_datasets')
     #pathDirFeaturesImage = os.path.join(pathWork,'4_bof','train')
-    pathDirFeaturesImage = os.path.join(pathWork,'4_bof','test')
+    pathDirFeaturesImage = os.path.join(pathWork,'4_bof','Images_total')
     #pathDirFeaturesText = os.path.join(pathWork,'4_tfidf','test')
     
     #pathFileVisualModel = os.path.join(pathDirModels,'visual_model_svm.p')
-    pathFileVisualModel = os.path.join(pathDirModels,'visual_model_svm_prova2.p')
+    pathFileVisualModel = os.path.join(pathDirModels,'visual_model_12345.p')
     #pathFileTextualModel = os.path.join(pathDirModels,'textual_model_svm_annotation.p')
     
     # Ontology
@@ -37,7 +37,7 @@ def main():
     
     # file with test images ids
     #pathFileDataset = os.path.join( pathDirDatasets, 'test.txt')
-    pathFileDataset = os.path.join( pathDirDatasets, 'test.txt')
+    pathFileDataset = os.path.join( pathDirDatasets, 'test_adria.txt')
     
     # Run detectors
     t_ref = time.time()
@@ -58,7 +58,7 @@ def main():
     #path to save results
     pathDirResults = os.path.join( pathWork,'6_results')
     #file to save results
-    pathFileVisualResults = os.path.join( pathDirResults,'visual_results_prova2.txt')
+    pathFileVisualResults = os.path.join( pathDirResults,'visual_results_adria.txt')
     #pathFileTextualResults = os.path.join( pathDirResults,'textual_results.txt')
         
     # Save resuts to file
