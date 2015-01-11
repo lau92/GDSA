@@ -1,0 +1,35 @@
+# -*- coding: utf-8 -*-
+import pickle
+
+class Ontology:
+    
+    def __init__(self):
+                
+        # Declare a list to store all classes
+        self.setClasses = set()
+        
+    def doesSemanticClassExist( self, className ):
+        
+        return className in self.setClasses
+            
+    def addSemanticClass( self, className ):
+        
+        if self.doesSemanticClassExist == False:
+            print 'WARNING(Ontology.addSemanticClass): Semantic class ' + className + ' already exists.'
+            return            
+        
+        # ...and add it to the list
+        self.setClasses.add( className )
+        
+    def getSemanticClassNames( self ):
+        """ Return a set with all semantic classes which are considered in the annotation """
+        return self.setClasses
+        
+    def saveOntology ( self, ontologyPathFile ):
+        
+        pickle.dump(self.setClasses, open( ontologyPathFile ,'wb'))
+    
+    def loadOntology ( self, ontologyPathFile ):
+        
+        self.setClasses = pickle.load( open( ontologyPathFile, "rb" ))
+    
