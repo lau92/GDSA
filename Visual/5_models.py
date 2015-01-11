@@ -21,7 +21,7 @@ if __name__ == "__main__":
     pathDirDatasets = os.path.join( pathWork,'2_datasets')
     #pathFileFeaturesImage = os.path.join(pathWork,'4_bof','train')
     #pathFileFeaturesText = os.path.join(pathWork,'4_tfidf','train')
-    pathFileFeaturesImage = os.path.join(pathWork,'4_bof','train')
+    pathFileFeaturesImage = os.path.join(pathWork,'4_bof','train12345')
     #pathFileFeaturesText = os.path.join(pathWork,'4_tfidf','train')
     ontologyFile = 'ontology.p'
     annotationFile = 'annotation.p'
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     #textual_trainer = Trainer( pathFileFeaturesText, annotation)
     
     # Run trainers
-    pathFileDataset = os.path.join( pathDirDatasets, 'train.txt')
+    pathFileDataset = os.path.join( pathDirDatasets, 'train12345.txt')
     #pathFileDataset = os.path.join( pathDirDatasets, 'train.txt')
         
     t_ref = time.time()
@@ -60,4 +60,5 @@ if __name__ == "__main__":
 
     # Save models to disk
     #textual_trainer.save_model_to_disk( pathDirModels, 'textual_model_svm_annotation.p')
-    visual_trainer.save_model_to_disk( pathDirModels, 'visual_model_svm_prova2.p')
+    visual_trainer.save_model_to_disk( pathDirModels, 'visual_model_12345.p')
+
