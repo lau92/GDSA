@@ -1,0 +1,79 @@
+# -*- coding: utf-8 -*-
+
+import pandas as pd
+import nltk
+import os
+import pickle  
+from modules.socialevent.classification.Metadata import Metadata
+
+class TextVocabulary:
+    """ Creates a textual vocabulary and quantises textual features """
+    
+    def __init__(self, pathFile=None ):
+        
+        self.most_freq_tags = []
+        
+        # If a path file is provided...
+        if pathFile !=None:
+            # ...read from disk
+            self.loadFromDisk( pathFile )
+            
+    def buildFromTags( self, pathFileTags, numOfTerms ):
+
+        data_csv=pd.read_csv('%s' % (pathFileTags), sep='\t')
+        
+        
+        all_train_tags = data_csv['tag']
+        
+        # Obtain the tags freq
+        all_train_freq_tags = nltk.FreqDist(w.lower() for w in all_train_tags)
+        
+        # get only the numOfTerms most freq tags
+        self.most_freq_tags = all_train_freq_tags.keys()[:numOfTerms]
+    
+    def buildFromTags2( self, listOfTags, numOfTerms):
+        # Obtain the tags freq
+        all_train_freq_tags = nltk.FreqDist(w.lower() for w in listOfTags)
+        
+        # get only the 2000 most freq tags
+        self.most_freq_tags = all_train_freq_tags.keys()[:numOfTerms]
+        
+    def processTxtFile( self, pathTxtFile, metadataPath, tagsPath):
+        
+        # create a metadata object
+        metadata = Metadata(metadataPath,tagsPath)
+        
+        # ----------------------------------------------------------------------
+        # Read the file containing the image IDs
+        fileDataset = open( pathTxtFile, 'r')
+        # Read lines from the text file, stripping the end of line character
+        imageIds = [line.strip() for line in fileDataset ]
+        # Close file
+        fileDataset.close()
+        # ----------------------------------------------------------------------
+        listOfTags = []
+        # Process the collection of image IDs
+        for imageId in imageIds:
+            if metadata.get_tags_by_id(imageId)!=None:# si la imagen no tiene tags peta
+                for tag in metadata.get_tags_by_id(imageId):
+                    listOfTags.append(tag)
+        
+        return listOfTags
+   
+        
+            
+    def get_most_freq_tags(self):
+        return self.most_freq_tags
+         
+    def loadFromDisk(self, pathFile):
+        
+        if not os.path.exists( pathFile):
+            print "File not found " + pathFile
+            return
+            
+        self.most_freq_tags = pickle.load( open( pathFile, "rb" ) )
+        
+    def saveToDisk(self, pathFile):
+        
+        # Save mini batch K-Means to disk using Pickle
+        pickle.dump( self.most_freq_tags, open( pathFile, "wb" ) )
