@@ -20,7 +20,7 @@ def main():
     pathDirFeaturesText = os.path.join(pathWork,'4_tfidf','test')
     
 #    pathFileVisualModel = os.path.join(pathDirModels,'visual_model_svm.p')
-    pathFileTextualModel = os.path.join(pathDirModels,'textual_model_svm_annotation.p')
+    pathFileTextualModel = os.path.join(pathDirModels,'textual_model_23_12.p')
     
     # Ontology
     ontologyFile = 'ontology.p'
@@ -56,7 +56,7 @@ def main():
     pathDirResults = os.path.join( pathWork,'6_results')
     #file to save results
 #    pathFileVisualResults = os.path.join( pathDirResults,'visual_results.txt')
-    pathFileTextualResults = os.path.join( pathDirResults,'textual_results.txt')
+    pathFileTextualResults = os.path.join( pathDirResults,'textual_results_23_12.txt')
         
     # Save resuts to file
 #    visual_detector.save_to_file(pathFileVisualResults)
