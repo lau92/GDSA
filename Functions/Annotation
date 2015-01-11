@@ -1,0 +1,208 @@
+import os
+import pickle
+import numpy
+from modules.classification.LabelType import LabelType
+from modules.classification.Ontology import Ontology 
+from modules.classification.AnnotatedSemanticClass import AnnotatedSemanticClass        
+
+
+class Annotation:
+    """ This class contains a collection of annotated semantic classes organised
+        as a dictionary. """
+        
+        
+    def __init__(self, ontology):
+        
+        # Declare the dictonary to store all annotateclasses
+        self.dicClasses = {}
+        
+        # Keep a pointer to the ontology that defines the semantic classes
+        self.ontology = ontology
+        
+        
+    def isSemanticClassInstantiated( self, className ):
+        
+        annotatedSemanticClass = self.dicClasses.get( className )
+        
+        # If the semantic class does not exist..
+        if annotatedSemanticClass == None:
+            return False
+        else:
+            return True
+            
+        
+    def getSemanticClassNames( self ):
+        """ Return a list with all semantic classes which are considered in the annotation """
+        return self.dicClasses.keys()
+        
+        
+    def addInstance(self, className, labelType, docId ):
+        
+        # Check that the provided semantic class is defined in the ontology
+        if self.ontology.doesSemanticClassExist(className) == False:
+            print 'WARNING(Annotation.addInstance): Non declared semantic class ' + className
+            return
+        
+        """ Get the annotated semantic class """     
+        annotatedSemanticClass = self.dicClasses.get( className )
+        # If the semantic class does not exist..
+        if annotatedSemanticClass == None:
+            
+            # Create a new annotated semantic class...
+            annotatedSemanticClass = AnnotatedSemanticClass()
+        
+            # ...and add it to the dictionary
+            self.dicClasses[ className ] = annotatedSemanticClass
+   
+        # Add the document ID to the annotated semantic class
+        annotatedSemanticClass.addInstance( labelType, docId )
+        
+    
+    def mountLists(self, className, pathDirAnns):
+  
+        semanticClass = self.dicClasses.get( className )
+        #print className
+        semanticClass.addPos()
+
+        for product in os.listdir(pathDirAnns):
+
+	    proName=os.path.splitext(product)[0]
+            if (proName!=className):
+               # print proName
+               
+                semanticClass = self.dicClasses.get( proName )
+                
+                if semanticClass == None:
+                    semanticClass = AnnotatedSemanticClass()
+        
+                    # ...and add it to the dictionary
+                    self.dicClasses[ proName ] = semanticClass
+
+
+                semanticClass.addNeg()
+                
+      
+    
+    def addNegatives(self, className , pathDirAnns):
+        
+        for product in os.listdir(pathDirAnns):
+
+	    proName=os.path.splitext(product)[0]
+            if (proName!=className):
+                print proName
+                semanticClass = self.dicClasses.get( proName )
+                if semanticClass == None:
+            
+            
+                    semanticClass = AnnotatedSemanticClass()
+        
+            
+                    self.dicClasses[ className ] = semanticClass
+                #print semanticClass.getList()
+                semanticClass.addNeg()
+                #print semanticClass.getList()
+    
+    def getClassList(self, className ):
+
+        semanticClass = self.dicClasses.get( className )
+        
+        return semanticClass.getList()
+        
+        
+        
+    def getNofDocsInClass(self, className, labelType ):
+        """ Returns an integer with the amount of documents in the specified class """
+        
+        # Check that the provided semantic class is defined in the ontology
+        if self.ontology.doesSemanticClassExist() == False:
+            print 'WARNING(Annotation.addInstance): Non declared semantic class ' + className
+            return 0
+            
+        if self.isSemanticClassInstantiated( className ) == False:
+            return 0
+            
+        semanticClass = self.dicClasses.get( className )
+        
+        return semanticClass.getNofDocsInClass(self, labelType )
+        
+    def getDocIdsInClass( self, className, labelType ):
+        
+        # Check that the provided semantic class is defined in the ontology
+        if self.ontology.doesSemanticClassExist(className) == False:
+            print 'WARNING(Annotation.addInstance): Non declared semantic class ' + className
+            return 0
+                
+        # If there the provided class exists..
+        if self.isSemanticClassInstantiated( className ) == True:
+            
+            # Get the semanticClass
+            semanticClass = self.dicClasses.get( className )
+            
+            # Append the doc IDs associated to the label
+            return semanticClass.getDocIdsInClass( labelType ) 
+        else:
+            
+            # Return an empty list of doc IDs
+            return []
+        
+    def getAnnotatedClasses( self, labelType, docId ):
+        """ Obtain a  list of class names where the provided document ID has 
+        been labeled """
+
+        # Create an empty list
+        retrievedClasses = []
+
+        # For each annotated class
+        
+        for className in self.dicClasses.keys():
+            
+            semanticClass = self.dicClasses[ className ]
+            
+            # If the class contains the document ID...
+            if semanticClass.containsDocId( labelType, docId ):
+                # ...add the docId to the associated list
+                retrievedClasses.append( className )
+            
+        return retrievedClasses
+        
+    def completetheAnnotation( self ):
+        
+        for semanticClassName in self.ontology.getSemanticClassNames():
+            
+            for imageID in self.getDocIdsInClass(semanticClassName, LabelType.POSITIVE):
+                " add each image from the positive label type to the other label types"
+                self.addInstance(semanticClassName, LabelType.NEGATIVE, imageID)
+                self.addInstance(semanticClassName, LabelType.NEUTRAL, imageID)
+
+
+# Main
+if __name__ == "__main__":
+
+ 
+    
+    # Create an ontology
+    ontology = Ontology()
+    
+    # Add semantic classes
+    ontology.addSemanticClass('cat')
+    ontology.addSemanticClass('dog')
+
+    # Define an annotation based on the ontology
+    annotation = Annotation( ontology )    
+        
+    # Add two nstances to the class 'cat'
+    annotation.addInstance( 'cat', LabelType.POSITIVE, 'image01')        
+    annotation.addInstance( 'cat', LabelType.POSITIVE, 'image02')        
+
+    # Check that the data is correctly stored
+    print annotation.getDocIdsInClass( 'cat', LabelType.POSITIVE )
+
+    # Point to the local path where the ground truth and metadata are stored
+    HOME = os.path.expanduser('~')
+    DATASETS_PATH = os.path.join(HOME,'work')
+    GROUND_TRUTH_FILE = 'sed2013_task2_dataset_train_gs.csv'
+    
+    # Save the a
+    gtPath = os.path.join(DATASETS_PATH, GROUND_TRUTH_FILE)
+    annotation = Annotation(gtPath, ontology)
+    
