@@ -1,11 +1,10 @@
 Repository for UPC socialevent detection project.
 
-L'idioma utilitzat és python amb la llibreria Pyxel.
+The language used by textual and visual precesses is python with Pyxel library.
 
-Per obtenir resultats textuals, cal executar el codi de la carpeta textual en l'ordre dels noms (números) dels codis.
+For textual results, run the code that is into "text" folder in correct order.
+For visual results, run the code that is into "visual" folder in correct order.
+Both processes have to run with the necessary functions saved into the "functions" folder
 
-Per obtenir resultats visuals, cal executar el codi de la carpeta visual en l'ordre dels noms (números) dels codis.
-
-L'idioma utilitzat per l'avaluador és Matlab.
-
-S'utilitza el fitxer avaluador per obtenir els resultats i aquest necessita de la funció getcm per poder funcionar correctament.
+The language used by the evaluator is Matlab.
+The file used for evaluating the results is called "avaluador" and needs the function called "getcm" to work correctly.
