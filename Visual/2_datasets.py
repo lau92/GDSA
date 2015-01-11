@@ -1,8 +1,3 @@
-#ejecutar:
-#runfile('C:/Users/Adria/Documents/upc_temp/gdsa/Projecte/emohe-pyxel-deb01cc5202e/tools/
-#socialevent/mediaeval2013/classification/2_datasets.py', wdir=r'C:/Users/Adria/Documents
-#/upc_temp/gdsa/Projecte/emohe-pyxel-deb01cc5202e')
-
 import os
 
 from modules.computation.Dataset import Dataset
