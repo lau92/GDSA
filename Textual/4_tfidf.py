@@ -79,7 +79,7 @@ if __name__ == "__main__":
     listOfTags = textVocabulary.processTxtFile(pathFileDataset,metadataPath,tagsPath) #millora!  
     textVocabulary.buildFromTags2(listOfTags, (len(listOfTags)/2)) 
     
-    pathFileVocabulary = os.path.join( pathWork, '3_vocabulary', 'text.p')
+    pathFileVocabulary = os.path.join( pathWork, '3_vocabulary', 'text_23_12.p')
     textVocabulary.saveToDisk(pathFileVocabulary)
     
     # --------------------------------------------------------------------------
@@ -93,6 +93,6 @@ if __name__ == "__main__":
     processLabel(tfidfExtractor, pathDirTfidfs, 'train')
     
     # Process the test dataset
-    processLabel(tfidfExtractor, pathDirTfidfs, 'test')
+    #processLabel(tfidfExtractor, pathDirTfidfs, 'test')
     
     print "Extracting TF-IDF... done."
