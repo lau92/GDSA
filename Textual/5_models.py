@@ -57,6 +57,5 @@ if __name__ == "__main__":
     
 
     # Save models to disk
-    textual_trainer.save_model_to_disk( pathDirModels, 'textual_model_svm_annotation.p')
+    textual_trainer.save_model_to_disk( pathDirModels, 'textual_model_23_12.p')
 #    visual_trainer.save_model_to_disk( pathDirModels, 'visual_model_svm.p')
-    
