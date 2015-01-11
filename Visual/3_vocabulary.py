@@ -12,11 +12,11 @@ def main(argv):
     # Define the default values for the options
     pathHome = os.path.abspath('C:\Users\Adria\Documents\upc_temp\gdsa\Projecte\proves_proj\emohe-pyxel-deb01cc5202e')
     pathWork = os.path.join(pathHome, 'tools','socialevent','mediaeval2013','classification' )    
-    pathDirImages = os.path.join( pathWork, '1_images', 'train' )
-    pathFileDatasetTrain = os.path.join(pathWork, '2_datasets', 'train.txt')
+    pathDirImages = os.path.join( pathWork, '1_images', 'train12345' )
+    pathFileDatasetTrain = os.path.join(pathWork, '2_datasets', 'train12345.txt')
     #pathDirImages = os.path.join( pathWork, '1_images', 'train' )
     #pathFileDatasetTrain = os.path.join(pathWork, '2_datasets', 'train.txt')
-    pathVocabulary = os.path.join(pathWork, '3_vocabulary', 'vocabulary_prova2.p')
+    pathVocabulary = os.path.join(pathWork, '3_vocabulary', 'vocabulary12345.p')
 
     _flagVerbose=False
     
@@ -38,5 +38,3 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-    
-
