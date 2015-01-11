@@ -1,0 +1,160 @@
+# -*- coding: utf-8 -*-
+import datetime
+import numpy as np
+import os
+import pandas as pd
+import time
+
+def parse_dates(x):
+    if (x == '0000-00-00 00:00:00'):
+        x = '1980-01-28 00:00:00'
+    return datetime.datetime.strptime(x,'%Y-%m-%d %H:%M:%S')
+
+class Metadata:
+    """ This class read a MediaEvals 2013 SED Task 2 metadata CSV files. 
+    Data is stored in the following columns:
+    Column 0:    document_id
+    Column 1:    url_pic
+    Column 2:    url_page
+    Column 3:    username
+    Column 4:    date_taken
+    Column 5:    title
+    Column 6:    description    
+    Column 7:    latitude
+    Column 8.    longitude  
+    Column 9.    tag
+    """ 
+       
+    def __init__(self, pathFile,pathFiletag):  
+        # Generate a DataFrame by reading the ground truth from a CSV whose
+        # fields are separated by \t   
+                
+        self._data = pd.DataFrame()  
+        
+        # document_id	url_pic	url_page	username	date_taken	title	latitude	longitude
+
+        # Read data from file   
+        #self._data = pd.read_csv(pathFile,sep='\t',lineterminator='\n',parse_dates=['date_taken'],date_parser=parse_dates,quoting=3)
+        #self.tags = pd.read_csv(pathFiletag,sep = '\t',lineterminator='\n')
+        self._data = pd.read_csv(pathFile,sep='\t',parse_dates=['date_taken'],date_parser=parse_dates,quoting=3)
+        self.tags = pd.read_csv(pathFiletag,sep = '\t')
+        
+        self.tags_dict = self.tags.set_index('document_id')['tag'].to_dict()
+        
+        # group tags by document_id
+        #self.tags.groupby('document_id')
+        #self.tags = self.tags.sort_index(by='document_id')
+    
+        # Index data according to its document_id field
+        #self._data = self._data.sort_index(by='document_id')
+      
+        # merge tags with the other metadata, how='outer' Use union of keys from both frames
+        self._data = pd.merge(self._data,self.tags,on='document_id',how='inner')  
+                  
+                              
+        #self._data = pd.read_csv(pathFile,sep='\t',lineterminator='\n',
+        #                        parse_dates=['datetaken','dateupload'],
+        #                        date_parser=self.parse_dates,
+        #                        quoting=3)
+         
+        #self._data['timestamp_taken']=self._data.datetaken.apply(lambda x: time.mktime(x.timetuple()))
+        
+        # Create a registry of the dates which are wrong. Those are the ones
+        # whose timestamp_taken is larger or equal to the timestamp of upload
+        #self.clean_dates()
+
+        
+        #self._data.title=self._data.title.fillna('')
+        
+        # Create an entry to keep the event ID predicted for each image
+        #self._data['cluster']=pd.Series(np.zeros(self._data.document_id.size),index=self._data.index)
+        # merge tags 
+        #self._data=self.read_tags(pathFiletag)
+        
+
+    def get_data(self):
+        return self._data
+    
+    def __getitem__(self,item):
+        return self._data[str(item)]
+    
+    def clean_dates(self):
+        
+        bad_date=pd.Series(np.zeros(self._data.document_id.size),index=self._data.index)
+        
+        # Modi
+        bad_date[self._data.timestamp_taken >= self._data.timestamp_upload] = 1
+        
+        # Change the time of the timestamp of taken with the timestamp of upload
+        # for all those photos that have been flagged as bad date
+        self._data.timestamp_taken[bad_date == 1] = self._data.timestamp_upload[bad_date == 1]
+        
+    def get_document(self, document_id):
+        return self._data.loc[document_id]
+   
+    def read_tags(self, pathFile):
+        tags = pd.read_csv(pathFile,sep = '\t',lineterminator='\n')
+        # group tags by document_id
+        tags.groupby('document_id')
+        # merge tags with the other metadata, how='outer' Use union of keys from both frames
+        return pd.merge(self._data,tags,on='document_id',how='outer')
+         
+       
+    def get_nof_photos(self):
+        return self._data.document_id.size
+        
+    def get_index(self):
+        return self._data.index
+    
+    def get_document_id (self):
+        return self._data['document_id']
+ 
+
+    def get_tags_by_id(self,document_id): # don't touch please, it works! =)
+        """ Obtain a vector containing the tags of the ID specified """
+        ret = []
+        t = self._data.groupby('document_id')
+        indx = self.tags.set_index(['document_id'])
+        if ( str(document_id) in indx.index ):
+            for i in t.groups[document_id]:
+                ret.append(self._data.loc[int(i),'tag'])
+            return ret
+    
+    def get_tags_by_id2(self,document_id): # don't touch please, it works! =)
+        """ Obtain a vector containing the tags of the ID specified """
+        return self.tags_dict[document_id]
+    
+    
+            
+    def get_supervector(self):
+        return list(self._data['tag'])
+        
+    def get_id_URL(self,document_id):
+        ret = []
+        t = self._data.groupby('document_id')
+        for i in t.groups[document_id]:
+            ret.append(self._data.loc[int(i),'url_pic'])
+        return ret
+
+        
+    def order_tags( self ):
+        self.tags.groupby('document_id')
+        
+        
+
+
+# Main
+if __name__ == "__main__":
+
+    # Point to the local path where the ground truth and metadata are stored
+    pathHome = os.path.abspath('C:\Users\Adria\Documents\upc_temp\gdsa\Projecte\proves_proj\emohe-pyxel-deb01cc5202e')
+    
+    pathWork = os.path.join(pathHome, 'tools','socialevent','mediaeval2013','classification' )
+    DATASETS_PATH = os.path.join(pathWork,'2_datasets')
+    METADATA_FILE = 'sed2013_task2_dataset_train.csv' 
+    TAG_FILE = 'sed2013_task2_dataset_train_tags.csv'
+    # Load the metadata
+    metadataPath = os.path.join(DATASETS_PATH, METADATA_FILE)
+    tagsPath = os.path.join(DATASETS_PATH, TAG_FILE)
+    metadata = Metadata(metadataPath,tagsPath)
+    
