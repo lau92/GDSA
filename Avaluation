@@ -1,0 +1,205 @@
+%GDSA 
+%Avaluador
+
+%Obrim el fitxers de dades de veritat terreny(proveït a atenea) i el fitxer
+%de dades del classificador
+% --- Per evitar errors es recomanable tenir els fitxers a la mateixa
+% --- carpeta on hi han els executables tot-hi que hi ha la comoditat de
+% --- seleccionar els arxius desde qualsevol carpeta
+%Fitxer CSV Veritat Terreny
+V_TERRENY   = uigetfile('*.csv','Fitxer Veritat Terreny CSV');
+ID_TERRENY  = fopen(V_TERRENY); 
+%Agafem totes les dades l'arxiu i les possem a la variable V_T
+V_T         = textscan(ID_TERRENY, '%s%s');% %s%s' -> agafa strings
+fclose(ID_TERRENY);% Tanquem l'arxiu 
+%Fitxer TXT classificador
+CLASS       = uigetfile('*.txt','Fitxer Classificació');
+ID_CLASS    = fopen(CLASS);
+%Agafem totes les dades l'arxiu i les possem a la variable C
+C           = textscan(ID_CLASS, '%s%s');  
+fclose(ID_CLASS); 
+
+%Agafem en diferents variables els valors de les columnes de cada fitxer
+%Pel classificador tindrem ->   1ªcolumna id's de les imatges 
+%                               2ªcolumna event al que pertany
+ID_IMATGE_C    = C{:,1};     % 1ª columna
+ID_EVENT_C     = C{:,2};     % 2ª columna
+ID_EVENT_C     = ID_EVENT_C';        % Permutació del vector
+L_C            = length(ID_EVENT_C); %Llargada del vector que conté les imatges classificades
+
+%Pel fitxer Veritat Terreny tindrem -> 1ªcolumna id's de les imatges 
+%                                      2ªcolumnaevent al que pertany
+ID_V_T          = V_T{:,1}; % 1ª columna
+ID_event_V_T    = V_T{:,2}; % 2ª columna
+ID_event_V_T    = ID_event_V_T';    % Permutació del vector
+L_V_T           = length(ID_event_V_T); %Llargada del vector que conté la veritat terreny 
+ 
+
+
+% Es transformen els dos vector d'informació de la veritat a un map 
+TAULA_V_T = containers.Map();
+for i = 1:L_V_T
+    TAULA_V_T(ID_V_T{i}) = ID_event_V_T{i};
+end
+ 
+% Es recorre tota la taula de veritat terreny comparant i mirant les ID de
+% tots dos fitxers obtinguts
+for i=1:L_C
+    ID_BUCLE = ID_IMATGE_C{i};
+    % Si existeix la ID de la imatge del classificador dins la taula de la
+    % veritat terreny assignem els valors a la taula de veritat terreny
+    if(isKey(TAULA_V_T,ID_BUCLE) == 1) 
+        ID_V_T{i}       = ID_BUCLE;
+        ID_event_V_T{i} = TAULA_V_T(ID_BUCLE);
+    end    
+end
+
+ 
+
+% Quantitzem els parametres del vector per tal de poder calcular després la
+% Fscore, etc
+% Quantització -> comparació posicions del vector amb l'event -> ho fa la
+% funció strcmp
+% S'ha de fer amb el vector del classificador i de la veritat terreny
+% 1er amb la V_T:
+v_t = zeros(1,L_V_T); % Inicialitzem el vector perque tingui la mateixa llargaria
+for i = 1:L_V_T
+    if strcmp(ID_event_V_T(i),'fashion')
+        v_t(i) = 1;
+        elseif strcmp(ID_event_V_T(i),'concert')
+        v_t(i) = 2;
+        elseif strcmp(ID_event_V_T(i),'non_event')
+        v_t(i) = 3;
+        elseif strcmp(ID_event_V_T(i),'exhibition')
+        v_t(i) = 4;
+        elseif strcmp(ID_event_V_T(i),'sports')
+        v_t(i) = 5;
+        elseif strcmp(ID_event_V_T(i),'protest')
+        v_t(i) = 6;
+        elseif strcmp(ID_event_V_T(i),'theater_dance')
+        v_t(i) = 7;
+        elseif strcmp(ID_event_V_T(i),'conference')
+        v_t(i) = 8;
+        elseif strcmp(ID_event_V_T(i),'other')
+        v_t(i) = 9;   
+    end;   
+end;
+ 
+
+% 2n amb la C:
+c = zeros(1,L_V_T); % Inicialitzem el vector perque tingui la mateixa llargaria
+for i=1:L_C
+    if strcmp(ID_EVENT_C(i),'fashion')
+        c(i) = 1;
+        elseif strcmp(ID_EVENT_C(i),'concert')
+        c(i) = 2;
+        elseif strcmp(ID_EVENT_C(i),'non_event')
+        c(i) = 3;
+        elseif strcmp(ID_EVENT_C(i),'exhibition')
+        c(i) = 4;
+        elseif strcmp(ID_EVENT_C(i),'sports')
+        c(i) = 5;
+        elseif strcmp(ID_EVENT_C(i),'protest')
+        c(i) = 6;
+        elseif strcmp(ID_EVENT_C(i),'theater_dance')
+        c(i) = 7;
+        elseif strcmp(ID_EVENT_C(i),'conference')
+        c(i) = 8;
+        elseif strcmp(ID_EVENT_C(i),'other')
+        c(i) = 9; 
+    end;   
+end;
+
+% Utilitzem getcm(actual,pred,classes) passant-li el vector veritat terreny
+% com a actual, el del classificador i un vector amb el nombre dels tipus d'events 
+    [mconfusio,numcorrecte,precisio,record,fscore] = getcm(v_t,c,(1:9))
+% Aquesta funció ens retornarà la matriu de confusió, l'exactitud,la
+% precisió, el record, i el fscore.
+
+% Contem quantes classes hi ha a la veritat terreny i al classificador
+num_classes = 0;
+for j = 1:9
+    for i = 1:length(v_t)
+        if v_t(i) == j
+            num_classes = num_classes + 1;
+            break; 
+        end
+    end
+end
+ 
+% Càlculs de les mitjanes 
+Precisio    = sum(precisio)/num_classes;
+Record      = sum(record)/num_classes;
+Fscore      = sum(fscore)/num_classes;
+Exactitud   = (numcorrecte/L_C)*100;
+
+ordre_events = {'fashion','concert','non_event','exhibition','sports','protest','theater_dance','conference','other'};
+
+% Una vegada obtinguts tots e resultats crearem un arxiu on arxivar-los
+% Si l'arxiu ja existeix el sobrescriu, sinó el crea
+resultats = fopen('resultats.txt','w');
+% modifiquiem l'arxiu :
+fprintf(resultats, 'Resultats Mitjans:');
+fprintf(resultats,'\n');
+fprintf(resultats,'\n');
+    fprintf(resultats,'Precisió = ');
+    fprintf(resultats,'%f \n',Precisio);
+    fprintf(resultats,'\n');
+ 
+    fprintf(resultats,'Record = ');
+    fprintf(resultats,'%f \n',Record);
+    fprintf(resultats,'\n');
+ 
+    fprintf(resultats,'Fscore=');
+    fprintf(resultats,'%f \n',Fscore);
+    fprintf(resultats,'\n');
+    % Modifiquem l'exactitud perque no surti en %
+    Exactitut= Exactitud/100;
+    fprintf(resultats,'Exactitud=');
+    fprintf(resultats,'%f \n',Exactitut);
+    fprintf(resultats,'\n');
+
+% Per tal de poder millorar el projecte i veure millor on classifica millor o pitjor,
+% també mostrem els resultats de
+% L'avaluació per a cada event
+fprintf(resultats,'\n');
+fprintf(resultats,'Avaluació per a cada event : ');
+fprintf(resultats,'\n');
+fprintf(resultats,'\n');
+fprintf(resultats, 'Precisió: ');
+    for i=1:9
+        fprintf(resultats,'%f \n',precisio(i));
+        fprintf(resultats, '\n');
+    end
+
+fprintf(resultats, 'Record: ');
+    for i=1:9
+           fprintf(resultats,'%f \n', record(i));
+        fprintf(resultats, '\n');
+    end
+
+fprintf(resultats, 'Fscore:\n');
+for i=1:9
+    fprintf(resultats,'%f \n',fscore(i));
+    fprintf(resultats, '\n');
+end
+fclose(resultats);
+
+% Per a una millor visualització i enteniment dels resultats, fem una
+% gràfica amb tots els events per les tres avaluacions:
+figure(1),
+x=[precisio(1),precisio(2),precisio(3),precisio(4),precisio(5),precisio(6),precisio(7),precisio(8),precisio(9)];
+    bar(x,'y'), title('Precisió');
+    ylabel('Resultat')
+    xlabel('Event')
+figure(2),
+x2=[record(1),record(2),record(3),record(4),record(5),record(6),record(7),record(8),record(9)];
+    bar(x2,'r'), title('Record');
+    ylabel('Resultat')
+    xlabel('Event')
+figure(3),
+x3=[fscore(1),fscore(2),fscore(3),fscore(4),fscore(5),fscore(6),fscore(7),fscore(8),fscore(9)];
+    bar(x3,'b'), title('Fscore');
+       ylabel('Resultat')
+       xlabel('Event')
+ 
